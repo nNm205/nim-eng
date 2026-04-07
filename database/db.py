@@ -1,0 +1,37 @@
+import sqlite3
+
+conn = sqlite3.connect("database/db.sqlite")
+cursor = conn.cursor()
+
+# user profile
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    level TEXT
+)
+""")
+
+# learning history
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS learning_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    input TEXT,
+    response TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+# progress tracking
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS progress (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    skill TEXT,
+    score REAL
+)
+""")
+
+conn.commit()
+conn.close()
