@@ -1,6 +1,8 @@
 import sqlite3
+import os 
+from dotenv import load_dotenv
 
-DB_PATH = "database/db.sqlite"
+DB_PATH = os.getenv("DB_PATH")
 
 def save_interaction(user_id, user_input, response):
     conn = sqlite3.connect(DB_PATH)

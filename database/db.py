@@ -1,6 +1,10 @@
 import sqlite3
+import os 
+from dotenv import load_dotenv
 
-conn = sqlite3.connect("database/db.sqlite")
+load_dotenv()
+
+conn = sqlite3.connect(os.getenv("DB_PATH"))
 cursor = conn.cursor()
 
 # user profile
