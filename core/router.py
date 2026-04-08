@@ -5,7 +5,6 @@ llm = LLMProvider()
 def detect_intent(user_input):
     with open("prompts/router_prompt.txt") as f:
         template = f.read() 
-        print(template)
 
     prompt = template + f"\nInput: {user_input}"
 

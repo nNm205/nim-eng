@@ -4,8 +4,27 @@ Student text:
 {answer}
 
 Tasks:
-- Correct grammar mistakes
-- Highlight errors
-- Rewrite the correct version
-- Explain why the mistakes are wrong
-- Give a score (0-10)
+1. Correct grammar mistakes
+2. Highlight errors
+3. Rewrite the correct version
+4. Explain why the mistakes are wrong
+5. Give a score (0-10)
+6. Identify mistakes types from: 
+- grammar 
+- tense
+- vocabulary
+
+Return in format: 
+
+[CORRECTION]
+...
+
+[EXPLANATION]
+...
+
+[SCORE]
+...
+
+[MISTAKES]
+- type: <type> | example: <example> 
+

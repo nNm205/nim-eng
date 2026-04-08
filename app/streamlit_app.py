@@ -14,6 +14,8 @@ if st.button("Submit"):
         user_input = "grading: " + user_input
     elif mode == "Practice Exercises":
         user_input = "exericse: " + user_input 
+    else:
+        user_input = "qa: " + user_input
     
     response = orchestrator(user_input, user_id=1)
     st.write(response)

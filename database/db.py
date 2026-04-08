@@ -37,5 +37,15 @@ CREATE TABLE IF NOT EXISTS progress (
 )
 """)
 
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS mistakes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    mistake_type TEXT,
+    example TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
 conn.commit()
 conn.close()

@@ -10,7 +10,7 @@ def orchestrator(user_input, user_id=1):
     if "exercise" in intent: 
         response = exercise_agent(user_input)
     elif "grading" in intent: 
-        response = grading_agent(user_input)
+        response = grading_agent(user_id, user_input)
     else:
         response = qa_agent(user_id, user_input) 
 
