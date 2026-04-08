@@ -7,16 +7,10 @@ def curriculum_agent(user_id):
     weakness = get_weakness(user_id)
 
     if not weakness:
-        return "You can continue learning general English topics."
+        weakness = "general English"
 
-    prompt = f"""
-    You are an English teacher.
+    with open("prompts/curriculum_prompt.txt") as f:
+        template = f.read()
 
-    The student is weak in: {weakness}
-    
-    Suggest the next lesson topic for the student. 
-
-    Keep it short and specific. 
-    """
-
+    prompt = template.format(weakness=weakness)
     return llm.generate(prompt)

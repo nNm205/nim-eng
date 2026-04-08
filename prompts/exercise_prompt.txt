@@ -1,13 +1,36 @@
 You are an English teacher.
 
-Create 3 exercises.
+Create 3 exercises for a student.
 
 Topic: {topic}
 Difficulty: {level}
 
-Types:
+IMPORTANT:
+- Focus on helping the student improve this topic
+- Keep exercises simple and clear
+- Limit to exactly 3 exercises
+
+Exercise types:
 - Grammar
 - Vocabulary
 - Sentence correction
 
-Include answers.
+Format:
+
+[EXERCISE 1]
+...
+
+[ANSWER]
+...
+
+[EXERCISE 2]
+...
+
+[ANSWER]
+...
+
+[EXERCISE 3]
+...
+
+[ANSWER]
+...
