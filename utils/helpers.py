@@ -17,3 +17,19 @@ def extract_mistakes(response):
                 mistakes.append((t, e))
     
     return mistakes
+
+def extract_score(response):
+    lines = response.split("\n")
+
+    capture = False 
+    for line in lines:
+        if "[SCORE]" in line: 
+            capture = True 
+            continue 
+
+        if capture:
+            line = line.strip()
+            if line.replace(".", "", 1).isdigit():
+                return float(line)
+    
+    return None

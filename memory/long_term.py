@@ -61,3 +61,45 @@ def get_weakness(user_id):
     conn.close()
 
     return result[0] if result else None 
+
+def save_score(user_id, score): 
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    INSERT INTO progress (user_id, skill, score)
+    VALUES (?, ?, ?)
+    """, (user_id, "overall", score))
+
+    conn.commit()
+    conn.close()
+
+def get_progress(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT score, timestamp FROM progress
+    WHERE user_id=?
+    ORDER BY timestamp
+    """, (user_id,))
+
+    data = cursor.fetchall()
+    conn.close()
+
+    return data 
+
+def get_mistake_stats(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT mistake_type, COUNT(*) FROM mistakes 
+    WHERE user_id=?
+    GROUP BY mistake_type
+    """, (user_id,))
+
+    data = cursor.fetchall()
+    conn.close()
+
+    return data 

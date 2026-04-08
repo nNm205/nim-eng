@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS progress (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
     skill TEXT,
-    score REAL
+    score REAL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 )
 """)
 

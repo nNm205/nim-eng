@@ -1,6 +1,6 @@
 from llm.provider import LLMProvider 
-from utils.helpers import extract_mistakes
-from memory.long_term import save_mistake
+from utils.helpers import extract_mistakes, extract_score
+from memory.long_term import save_mistake, save_score
 
 llm = LLMProvider()
 
@@ -12,12 +12,12 @@ def grading_agent(user_id, answer):
     response = llm.generate(prompt)
 
     mistakes = extract_mistakes(response)
-    print("Extracted mistakes:", mistakes)
-    
     if mistakes:
         for m in mistakes:
             save_mistake(user_id, m[0], m[1])
 
-    return response
-
-print(grading_agent(user_id=1, answer="She was going to school now"))
+    score = extract_score(response)
+    if score is not None: 
+        save_score(user_id, score)
+        
+    return response 
