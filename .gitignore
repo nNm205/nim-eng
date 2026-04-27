@@ -5,17 +5,18 @@ venv/
 .env
 .env.*
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
+
+# Database
 *.db
 *.sqlite3
-
-# SQLite database
 database/db.sqlite
 
 # Logs
 *.log
+logs/
 
 # Cache
 .cache/
@@ -30,6 +31,7 @@ database/db.sqlite
 # =========================
 node_modules/
 dist/
+dist-ssr/
 build/
 .next/
 out/
@@ -39,10 +41,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
 
-# =========================
-# Environment variables (IMPORTANT)
-# =========================
+# Env files (frontend)
 .env.local
 .env.development.local
 .env.test.local
@@ -55,7 +56,8 @@ pnpm-debug.log*
 Thumbs.db
 
 # VSCode
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 
 # JetBrains
 .idea/
@@ -65,3 +67,8 @@ Thumbs.db
 # =========================
 *.swp
 *.swo
+*.swn
+*.bak
+*.tmp
+*.temp
+*.local
