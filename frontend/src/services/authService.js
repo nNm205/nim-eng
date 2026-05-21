@@ -15,7 +15,6 @@ export const authService = {
     await api.post("/auth/logout");
   },
 
-  // Gọi khi app khởi động để verify cookie còn hợp lệ
   getMe: async () => {
     const res = await api.get("/auth/me");
     return res.data;
