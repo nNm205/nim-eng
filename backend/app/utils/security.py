@@ -38,5 +38,7 @@ def decode_access_token(token: str) -> dict:
             settings.JWT_SECRET_KEY,
             algorithms=[settings.JWT_ALGORITHM]
         )
+
+        return payload 
     except JWTError:
         return None 
