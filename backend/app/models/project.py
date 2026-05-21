@@ -79,11 +79,12 @@ class Project(Base):
         back_populates="projects"
     )
 
-    # documents = relationship(
-    #     "Document",
-    #     back_populates="project",
-    #     cascade="all, delete"
-    # )
+    documents = relationship(
+        "Document",
+        back_populates="project",
+        cascade="all, delete-orphan",
+        passive_deletes=True 
+    )
 
     # reports = relationship(
     #     "Report",
