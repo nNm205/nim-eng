@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timezone
 from sqlalchemy import Column, String, Boolean, Text, DateTime  
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column  
+from sqlalchemy.orm import Mapped, mapped_column, relationship 
 from app.database.base import Base 
 
 class User(Base):
@@ -61,4 +61,10 @@ class User(Base):
     subscription_plan: Mapped[str] = mapped_column(
         String(50),
         default="free"
+    )
+
+    projects = relationship(
+        "Project",
+        back_populates="user",
+        cascade="all, delete"
     )
