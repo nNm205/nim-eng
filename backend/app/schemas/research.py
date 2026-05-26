@@ -1,6 +1,7 @@
 from uuid import UUID
 from datetime import datetime
 from pydantic import BaseModel, Field, ConfigDict 
+from app.utils.constants import ResearchStatus
 
 class ResearchCreate(BaseModel):
     query: str = Field(..., min_length=3, max_length=1000)
@@ -9,6 +10,7 @@ class ResearchCreate(BaseModel):
 class SearchResultResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: UUID
+    document_id: UUID | None 
     title: str
     url: str
     snippet: str | None 
@@ -22,7 +24,7 @@ class ResearchResponse(BaseModel):
     id: UUID
     project_id: UUID
     query: str
-    status: str
+    status: ResearchStatus
     results_count: int
     started_at: datetime
     completed_at: datetime | None 
@@ -31,7 +33,7 @@ class ResearchResponse(BaseModel):
 class ResearchStatusResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: UUID
-    status: str
+    status: ResearchStatus
     results_count: int
     started_at: datetime
     completed_at: datetime | None 
