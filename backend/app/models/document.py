@@ -93,14 +93,24 @@ class Document(Base):
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
+    # relationships 
     project = relationship(
         "Project",
         back_populates="documents",
+        lazy="selectin"
     )
 
-    # analyses = relationship(
-    #     "DocumentAnalysis",
-    #     back_populates="document",
-    #     cascade="all, delete",
-    # )
+    search_results = relationship(
+        "SearchResult",
+        back_populates="document",
+        lazy="selectin"
+    )
+
+    analysis = relationship(
+        "DocumentAnalysis",
+        back_populates="document",
+        uselist=False,
+        cascade="all, delete-orphan",
+        lazy="selectin"
+    )
 

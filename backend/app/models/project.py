@@ -83,11 +83,20 @@ class Project(Base):
         "Document",
         back_populates="project",
         cascade="all, delete-orphan",
-        passive_deletes=True 
+        passive_deletes=True,
+        lazy="selectin"
     )
 
-    # reports = relationship(
-    #     "Report",
-    #     back_populates="project",
-    #     cascade="all, delete"
-    # )
+    research_sessions = relationship(
+        "ResearchSession",
+        back_populates="project",
+        cascade="all, delete-orphan",
+        lazy="selectin"
+    )
+
+    reports = relationship(
+        "Report",
+        back_populates="project",
+        cascade="all, delete-orphan",
+        lazy="selectin"
+    )
