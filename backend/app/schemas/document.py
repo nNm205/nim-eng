@@ -27,7 +27,5 @@ class DocumentResponse(BaseModel):
     processed: bool
     relevance_score: float | None 
     created_at: datetime
-
     class Config:
         from_attributes = True
-
