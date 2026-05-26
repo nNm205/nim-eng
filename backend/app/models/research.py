@@ -83,7 +83,7 @@ class SearchResult(Base):
     __tablename__ = "search_results"
 
     __table_args__ = (
-        Index("idx_search_results_research_session_id", "research_session_id")
+        Index("idx_search_results_research_session_id", "research_session_id"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(

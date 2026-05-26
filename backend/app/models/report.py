@@ -16,7 +16,7 @@ class Report(Base):
     __tablename__ = "reports"
 
     __table_args__ = (
-        Index("idx_reports_project_id", "project_id")
+        Index("idx_reports_project_id", "project_id"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -26,7 +26,7 @@ class Report(Base):
         default=uuid.uuid4
     )
 
-    project_id = Mapped[uuid.UUID] = mapped_column(
+    project_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("projects.id", ondelete="CASCADE"),
         nullable=False 

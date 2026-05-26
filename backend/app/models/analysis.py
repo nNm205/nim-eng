@@ -16,7 +16,7 @@ class DocumentAnalysis(Base):
     __tablename__ = "document_analyses"
 
     __table_args__ = (
-        Index("idx_document_analyses_document_id", "document_id")
+        Index("idx_document_analyses_document_id", "document_id"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -26,7 +26,7 @@ class DocumentAnalysis(Base):
         default=uuid.uuid4
     )
 
-    document_id = Mapped[uuid.UUID] = mapped_column(
+    document_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("documents.id", ondelete="CASCADE"),
         nullable=False,

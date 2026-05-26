@@ -1,8 +1,6 @@
 import uuid 
 from typing import Any
-from enum import Enum 
 from datetime import datetime, timezone 
-from sqlalchemy import Enum as SQLEnum 
 from sqlalchemy import (
     String,
     Text,
@@ -14,12 +12,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import UUID, JSONB, BYTEA 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.base import Base 
-
-class DocumentSourceType(str, Enum):
-    WEB = "web"
-    ACADEMIC = "academic"
-    UPLOADED = "uploaded"
-    PDF = "pdf"
+from app.utils.constants import DocumentSourceType
 
 class Document(Base):
     __tablename__ = "documents"
@@ -47,8 +40,9 @@ class Document(Base):
         nullable=True,
     )
 
-    source_type: Mapped[str | None] = mapped_column(
-        SQLEnum(DocumentSourceType),
+    source_type: Mapped[str] = mapped_column(
+        String(50),
+        default=DocumentSourceType.PDF.value 
     )
 
     content: Mapped[str | None] = mapped_column(
