@@ -72,3 +72,10 @@ Thumbs.db
 *.tmp
 *.temp
 *.local
+
+frontend/**/*.md
+backend/**/*.md
+
+SETUP_GUIDE.md
+
+GIT_COMMITS.md 
