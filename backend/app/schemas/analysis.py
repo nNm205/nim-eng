@@ -27,3 +27,6 @@ class AnalysisStatusResponse(BaseModel):
     started_at: datetime
     completed_at: datetime | None 
     error_message: str | None 
+
+class AnalysisResultsResponse(DocumentAnalysisResponse):
+    pass 

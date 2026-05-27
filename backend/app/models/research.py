@@ -39,9 +39,15 @@ class ResearchSession(Base):
         nullable=False
     )
 
+    max_results: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False, 
+        default=10 
+    )
+
     status: Mapped[str] = mapped_column(
         String(50),
-        default=ResearchStatus.RUNNING.value 
+        default=ResearchStatus.PENDING.value 
     )
 
     results_count: Mapped[int] = mapped_column(
@@ -56,8 +62,7 @@ class ResearchSession(Base):
 
     completed_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
-        nullable=True, 
-        default=None 
+        nullable=True
     )
 
     error_message: Mapped[str | None] = mapped_column(
@@ -95,19 +100,13 @@ class SearchResult(Base):
 
     research_session_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey(
-            "research_sessions.id",
-            ondelete="CASCADE"
-        ),
+        ForeignKey("research_sessions.id", ondelete="CASCADE"),
         nullable=False
     )
 
     document_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey(
-            "documents.id",
-            ondelete="SET NULL"
-        ),
+        ForeignKey("documents.id", ondelete="SET NULL"),
         nullable=True
     )
 

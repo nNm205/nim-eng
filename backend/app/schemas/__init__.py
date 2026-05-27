@@ -20,3 +20,13 @@ from app.schemas.research import (
     ResearchStatusResponse,
     SearchResultResponse
 )
+from app.schemas.analysis import (
+    DocumentAnalysisResponse,
+    AnalysisStatusResponse
+)
+from app.schemas.report import (
+    ReportCreate,
+    ReportUpdate,
+    ReportResponse,
+    ReportListResponse 
+)

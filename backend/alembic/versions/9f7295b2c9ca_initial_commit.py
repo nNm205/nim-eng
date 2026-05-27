@@ -1,8 +1,8 @@
 """initial commit
 
-Revision ID: 380982223a57
+Revision ID: 9f7295b2c9ca
 Revises: 
-Create Date: 2026-05-26 22:20:38.198889
+Create Date: 2026-05-27 09:28:20.506382
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '380982223a57'
+revision: str = '9f7295b2c9ca'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -90,6 +90,7 @@ def upgrade() -> None:
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('project_id', sa.UUID(), nullable=False),
     sa.Column('query', sa.String(length=1000), nullable=False),
+    sa.Column('max_results', sa.Integer(), nullable=False),
     sa.Column('status', sa.String(length=50), nullable=False),
     sa.Column('results_count', sa.Integer(), nullable=False),
     sa.Column('started_at', sa.DateTime(timezone=True), nullable=False),
@@ -110,7 +111,9 @@ def upgrade() -> None:
     sa.Column('extracted_tables', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
     sa.Column('keywords', postgresql.ARRAY(sa.Text()), nullable=True),
     sa.Column('sentiment', sa.String(length=20), nullable=True),
-    sa.Column('analysis_date', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('started_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('completed_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('error_message', sa.Text(), nullable=True),
     sa.Column('processed_by', sa.String(length=100), nullable=True),
     sa.ForeignKeyConstraint(['document_id'], ['documents.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),

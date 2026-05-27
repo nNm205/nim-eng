@@ -39,6 +39,7 @@ class Report(Base):
 
     report_type: Mapped[str] = mapped_column(
         String(100),
+        nullable=False, 
         default=ReportType.RESEARCH_SUMMARY.value 
     )
 
