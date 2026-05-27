@@ -10,10 +10,14 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const data = await authService.getMe();
-        setUser(data);
+        const token = localStorage.getItem("access_token");
+        if (token) {
+          const data = await authService.getMe();
+          setUser(data);
+        }
       } catch {
         setUser(null);
+        localStorage.removeItem("access_token");
       } finally {
         setLoading(false);
       }
@@ -24,19 +28,27 @@ export const AuthProvider = ({ children }) => {
 
   const login = useCallback(async (email, password) => {
     const data = await authService.login(email, password);
+    localStorage.setItem("access_token", data.access_token);
     setUser(data.user);
     return data;
   }, []);
 
   const register = useCallback(async (payload) => {
     const data = await authService.register(payload);
+    localStorage.setItem("access_token", data.access_token);
     setUser(data.user);
     return data;
   }, []);
 
   const logout = useCallback(async () => {
-    await authService.logout();
-    setUser(null);
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      localStorage.removeItem("access_token");
+      setUser(null);
+    }
   }, []);
 
   return (
