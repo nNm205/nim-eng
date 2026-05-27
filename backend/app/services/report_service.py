@@ -31,11 +31,15 @@ def create_report(
         )
 
     try:
+        included_documents = [
+            str(doc_id) for doc_id in report_data.included_documents
+        ] if report_data.included_documents else None 
+
         report = Report(
             project_id=project_id,
             title=report_data.title,
             report_type=report_data.report_type.value,
-            included_documents=report_data.included_documents,
+            included_documents=included_documents,
             status=ReportStatus.DRAFT.value
         )
 
@@ -80,7 +84,6 @@ def get_report_by_id(
 
     return report
 
-
 def get_project_reports(
     db: Session,
     project_id: UUID
@@ -120,6 +123,9 @@ def update_report(
         for key, value in update_dict.items():
             if hasattr(value, "value"):
                 value = value.value
+            
+            if key == "included_documents" and value:
+                value = [str(doc_id) for doc_id in value]
 
             setattr(report, key, value)
 
@@ -164,7 +170,6 @@ def publish_report(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error"
         )
-
 
 def archive_report(
     db: Session,

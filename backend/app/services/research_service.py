@@ -32,6 +32,7 @@ def create_research_session(
         research_session = ResearchSession(
             project_id=project_id,
             query=research_data.query,
+            max_results=research_data.max_results, 
             status=ResearchStatus.PENDING.value 
         )
 
@@ -57,8 +58,11 @@ def get_research_session_by_id(
     research_session_id: UUID 
 ) -> ResearchSession: 
     logger.info(f"Fetching research session: {research_session_id}") 
+    
     result = db.execute( 
-        select(ResearchSession).where(ResearchSession.id == research_session_id) 
+        select(ResearchSession).where(
+            ResearchSession.id == research_session_id
+        ) 
     ) 
     research_session = result.scalar_one_or_none() 
     
@@ -80,8 +84,10 @@ def get_project_research_sessions(
 
     try:
         result = db.execute(
-            select(ResearchSession).where(ResearchSession.project_id == project_id)
-        ).order_by(ResearchSession.started_at.desc())
+            select(ResearchSession)
+            .where(ResearchSession.project_id == project_id)
+            .order_by(ResearchSession.started_at.desc())
+        )
 
         research_sessions = result.scalars().all()
 
