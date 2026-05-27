@@ -17,7 +17,7 @@ const LoginPage = () => {
       await login(form.email, form.password);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Đăng nhập thất bại");
+      setError(err.response?.data?.detail || "Đăng nhập thất bại");
     } finally {
       setLoading(false);
     }

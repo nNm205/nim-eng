@@ -26,13 +26,13 @@ const RegisterPage = () => {
     setLoading(true);
     try {
       await register({
-        name: form.name,
+        full_name: form.name,
         email: form.email,
         password: form.password,
       });
-      navigate("/onboarding");
+      navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Đăng ký thất bại");
+      setError(err.response?.data?.detail || "Đăng ký thất bại");
     } finally {
       setLoading(false);
     }
