@@ -1,4 +1,4 @@
-# 📊 NIM-Research: AI Research Assistant Multi-Agent 
+# NIM-Research: AI Research Assistant Multi-Agent 
 
 > An intelligent document analysis and research platform leveraging **LLM agents**, **RAG (Retrieval-Augmented Generation)**, and **multi-agent orchestration** to transform unstructured documents into actionable insights.
 
@@ -503,21 +503,6 @@ nim-eng/
 2. Commit changes: `git commit -am 'Add new feature'`
 3. Push to branch: `git push origin feature/your-feature`
 4. Submit a pull request
-
-
-## 👨‍💻 Author
-
-**AI Engineer Portfolio Project**
-
-This project demonstrates expertise in:
-- Full-stack web development
-- AI/ML integration and multi-agent systems
-- Database design and optimization
-- Real-time communication (WebSocket)
-- Cloud-ready architecture
-- Enterprise security practices
-
----
 
 ## 👨‍💻 Support & Contact
 
