@@ -1,6 +1,21 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import {
+  Home,
+  Folder,
+  FileText,
+  BarChart3,
+  ClipboardList,
+  BookOpen,
+  Bell,
+  LogOut,
+  Settings,
+  User,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight
+} from "lucide-react";
 
 const DashboardLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -19,26 +34,34 @@ const DashboardLayout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full bg-white border-r border-gray-200 transition-all duration-300 z-40 ${
+        className={`fixed top-0 left-0 h-full bg-white border-r border-slate-200 transition-all duration-300 z-40 shadow-sm ${
           sidebarOpen ? "w-64" : "w-20"
         }`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
+        <div className="h-20 flex items-center justify-between px-4 border-b border-slate-200">
           {sidebarOpen ? (
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+            <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <div className="w-10 h-10 bg-gradient-to-br from-teal-600 to-teal-700 rounded-lg flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-lg">N</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">NIM-ENG</span>
-            </div>
+              <div className="flex flex-col">
+                <span className="text-lg font-bold text-slate-900 leading-none">NIM</span>
+                <span className="text-xs text-slate-500 font-semibold">Research</span>
+              </div>
+            </Link>
           ) : (
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center mx-auto">
-              <span className="text-white font-bold text-lg">N</span>
-            </div>
+            <Link
+              to="/dashboard"
+              className="flex justify-center w-full hover:opacity-80 transition-opacity"
+            >
+              <div className="w-10 h-10 bg-gradient-to-br from-teal-600 to-teal-700 rounded-lg flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-lg">N</span>
+              </div>
+            </Link>
           )}
         </div>
 
@@ -57,24 +80,25 @@ const DashboardLayout = ({ children }) => {
         {/* Toggle Button */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="absolute -right-3 top-20 w-6 h-6 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors"
+          className="absolute -right-3 top-20 w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center hover:bg-slate-50 hover:border-slate-300 transition-all shadow-md"
+          title={sidebarOpen ? "Ẩn thanh bên" : "Hiển thị thanh bên"}
         >
-          <svg
-            className={`w-4 h-4 text-gray-600 transition-transform ${
-              !sidebarOpen ? "rotate-180" : ""
-            }`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
+          {sidebarOpen ? (
+            <ChevronLeft className="w-3 h-3 text-slate-600" />
+          ) : (
+            <ChevronRight className="w-3 h-3 text-slate-600" />
+          )}
         </button>
+
+        {/* Footer - User Info Minimal */}
+        {sidebarOpen && (
+          <div className="absolute bottom-4 left-4 right-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <p className="text-xs text-slate-600">Logged in as</p>
+            <p className="text-sm font-semibold text-slate-900 truncate">
+              {user?.full_name || "User"}
+            </p>
+          </div>
+        )}
       </aside>
 
       {/* Main Content */}
@@ -84,64 +108,48 @@ const DashboardLayout = ({ children }) => {
         }`}
       >
         {/* Header */}
-        <header className="h-16 bg-white border-b border-gray-200 sticky top-0 z-30">
-          <div className="h-full px-6 flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <h2 className="text-xl font-semibold text-gray-900">
+        <header className="h-20 bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+          <div className="h-full px-8 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl font-bold text-slate-900">
                 {menuItems.find((item) => item.path === location.pathname)
                   ?.label || "Dashboard"}
               </h2>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-4">
               {/* Notifications */}
-              <button className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                  />
-                </svg>
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              <button className="relative p-2.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors group">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                <span className="sr-only">Thông báo</span>
               </button>
+
+              {/* Divider */}
+              <div className="w-px h-6 bg-slate-200"></div>
 
               {/* User Menu */}
               <div className="relative">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="flex items-center gap-3 p-2 hover:bg-slate-100 rounded-lg transition-colors group"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-semibold text-sm">
+                  <div className="w-9 h-9 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+                    <span className="text-white font-bold text-sm">
                       {user?.full_name?.charAt(0).toUpperCase() || "U"}
                     </span>
                   </div>
                   <div className="text-left hidden md:block">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-semibold text-slate-900">
                       {user?.full_name || "User"}
                     </p>
-                    <p className="text-xs text-gray-500">{user?.email}</p>
+                    <p className="text-xs text-slate-500">{user?.email}</p>
                   </div>
-                  <svg
-                    className="w-4 h-4 text-gray-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+                  <ChevronDown
+                    className={`w-4 h-4 text-slate-600 transition-transform ${
+                      userMenuOpen ? "rotate-180" : ""
+                    }`}
+                  />
                 </button>
 
                 {/* Dropdown Menu */}
@@ -151,36 +159,30 @@ const DashboardLayout = ({ children }) => {
                       className="fixed inset-0 z-40"
                       onClick={() => setUserMenuOpen(false)}
                     ></div>
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50">
                       <Link
                         to="/profile"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 transition-colors group"
                         onClick={() => setUserMenuOpen(false)}
                       >
-                        <div className="flex items-center space-x-2">
-                          <span>👤</span>
-                          <span>Hồ sơ cá nhân</span>
-                        </div>
+                        <User className="w-4 h-4 text-slate-400 group-hover:text-teal-600 transition-colors" />
+                        <span>Hồ sơ cá nhân</span>
                       </Link>
                       <Link
                         to="/settings"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 transition-colors group"
                         onClick={() => setUserMenuOpen(false)}
                       >
-                        <div className="flex items-center space-x-2">
-                          <span>⚙️</span>
-                          <span>Cài đặt</span>
-                        </div>
+                        <Settings className="w-4 h-4 text-slate-400 group-hover:text-teal-600 transition-colors" />
+                        <span>Cài đặt</span>
                       </Link>
-                      <hr className="my-2 border-gray-200" />
+                      <hr className="my-2 border-slate-200" />
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors group"
                       >
-                        <div className="flex items-center space-x-2">
-                          <span>🚪</span>
-                          <span>Đăng xuất</span>
-                        </div>
+                        <LogOut className="w-4 h-4" />
+                        <span>Đăng xuất</span>
                       </button>
                     </div>
                   </>
@@ -191,25 +193,25 @@ const DashboardLayout = ({ children }) => {
         </header>
 
         {/* Page Content */}
-        <main className="p-6">{children}</main>
+        <main className="p-8">{children}</main>
       </div>
     </div>
   );
 };
 
-const NavItem = ({ path, label, icon, isActive, collapsed }) => {
+const NavItem = ({ path, label, icon: Icon, isActive, collapsed }) => {
   return (
     <Link
       to={path}
-      className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+      className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${
         isActive
-          ? "bg-blue-50 text-blue-600"
-          : "text-gray-700 hover:bg-gray-100"
+          ? "bg-teal-50 text-teal-600 shadow-sm border border-teal-200"
+          : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
       } ${collapsed ? "justify-center" : ""}`}
       title={collapsed ? label : ""}
     >
-      <span className="text-xl">{icon}</span>
-      {!collapsed && <span className="font-medium">{label}</span>}
+      <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-teal-600" : ""}`} />
+      {!collapsed && <span>{label}</span>}
     </Link>
   );
 };
@@ -218,32 +220,32 @@ const menuItems = [
   {
     path: "/dashboard",
     label: "Tổng quan",
-    icon: "🏠"
+    icon: Home
   },
   {
     path: "/projects",
     label: "Dự án",
-    icon: "📁"
+    icon: Folder
   },
   {
     path: "/documents",
     label: "Tài liệu",
-    icon: "📄"
+    icon: FileText
   },
   {
     path: "/analysis",
     label: "Phân tích",
-    icon: "📊"
+    icon: BarChart3
   },
   {
     path: "/reports",
     label: "Báo cáo",
-    icon: "📝"
+    icon: ClipboardList
   },
   {
     path: "/knowledge-base",
     label: "Knowledge Base",
-    icon: "📚"
+    icon: BookOpen
   }
 ];
 
