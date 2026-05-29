@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import DashboardLayout from "../components/layout/DashboardLayout";
+import { projectService } from "../services/projectService";
+import { documentService } from "../services/documentService";
+import { analysisService } from "../services/analysisService";
+import { reportService } from "../services/reportService";
 import {
   BookOpen,
   FileText,
@@ -14,17 +18,103 @@ import {
   Clock,
   CheckCircle2,
   AlertCircle,
-  ArrowRight
+  ArrowRight,
+  Loader
 } from "lucide-react";
 
 const DashboardPage = () => {
   const { user } = useAuth();
-  const [stats] = useState({
+  const [stats, setStats] = useState({
     projects: 0,
     documents: 0,
     analyses: 0,
     reports: 0
   });
+  const [projects, setProjects] = useState([]);
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      // Load projects
+      const projectsData = await projectService.getProjects();
+      const activeProjects = projectsData.filter(p => !p.is_archived);
+      setProjects(activeProjects.slice(0, 2)); // Show top 2 projects
+
+      // Calculate stats
+      let totalDocuments = 0;
+      let totalAnalyses = 0;
+      let totalReports = 0;
+
+      // Load documents and analyses for each project
+      const activities = [];
+      
+      for (const project of activeProjects.slice(0, 3)) {
+        try {
+          const docs = await documentService.getProjectDocuments(project.id);
+          totalDocuments += docs.length;
+
+          const analyses = await analysisService.getProjectAnalyses(project.id);
+          totalAnalyses += analyses.length;
+
+          const reports = await reportService.getProjectReports(project.id);
+          totalReports += reports.length;
+
+          // Add recent activities
+          if (docs.length > 0) {
+            activities.push({
+              type: "document",
+              title: `${docs.length} tài liệu trong "${project.name}"`,
+              time: "Gần đây",
+              status: "completed"
+            });
+          }
+
+          if (analyses.length > 0) {
+            const completedAnalyses = analyses.filter(a => a.status === "completed").length;
+            if (completedAnalyses > 0) {
+              activities.push({
+                type: "analysis",
+                title: `${completedAnalyses} phân tích hoàn thành`,
+                time: "Gần đây",
+                status: "completed"
+              });
+            }
+          }
+
+          if (reports.length > 0) {
+            activities.push({
+              type: "report",
+              title: `${reports.length} báo cáo trong "${project.name}"`,
+              time: "Gần đây",
+              status: "completed"
+            });
+          }
+        } catch (err) {
+          console.error(`Error loading data for project ${project.id}:`, err);
+        }
+      }
+
+      setStats({
+        projects: activeProjects.length,
+        documents: totalDocuments,
+        analyses: totalAnalyses,
+        reports: totalReports
+      });
+
+      setRecentActivities(activities.slice(0, 4));
+    } catch (err) {
+      console.error("Error loading dashboard data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -48,29 +138,29 @@ const DashboardPage = () => {
             title="Dự án"
             value={stats.projects}
             icon={Folder}
-            trend="0"
-            period="tuần này"
+            trend={stats.projects}
+            period="tổng cộng"
           />
           <StatCard
             title="Tài liệu"
             value={stats.documents}
             icon={FileText}
-            trend="0"
-            period="tuần này"
+            trend={stats.documents}
+            period="tổng cộng"
           />
           <StatCard
             title="Phân tích"
             value={stats.analyses}
             icon={BarChart3}
-            trend="0"
-            period="tuần này"
+            trend={stats.analyses}
+            period="tổng cộng"
           />
           <StatCard
             title="Báo cáo"
             value={stats.reports}
             icon={ClipboardList}
-            trend="0"
-            period="tuần này"
+            trend={stats.reports}
+            period="tổng cộng"
           />
         </div>
 
@@ -88,19 +178,19 @@ const DashboardPage = () => {
                   icon={Plus}
                   title="Dự án mới"
                   description="Bắt đầu một dự án nghiên cứu"
-                  onClick={() => alert("Chức năng đang phát triển")}
+                  onClick={() => window.location.href = "/projects"}
                 />
                 <QuickActionCard
                   icon={Upload}
                   title="Upload tài liệu"
                   description="Thêm tài liệu vào knowledge base"
-                  onClick={() => alert("Chức năng đang phát triển")}
+                  onClick={() => window.location.href = "/documents"}
                 />
                 <QuickActionCard
                   icon={Search}
                   title="Phân tích dữ liệu"
                   description="Chạy phân tích với AI agents"
-                  onClick={() => alert("Chức năng đang phát triển")}
+                  onClick={() => window.location.href = "/analysis"}
                 />
               </div>
             </div>
@@ -111,17 +201,22 @@ const DashboardPage = () => {
                 <h2 className="text-2xl font-bold text-slate-900">
                   Dự án của bạn
                 </h2>
-                <button className="text-teal-600 hover:text-teal-700 font-semibold text-sm flex items-center gap-2 group">
+                <a href="/projects" className="text-teal-600 hover:text-teal-700 font-semibold text-sm flex items-center gap-2 group">
                   Xem tất cả
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </button>
+                </a>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {projects.map((project, idx) => (
-                  <ProjectCard key={idx} {...project} />
-                ))}
-              </div>
-              {projects.length === 0 && (
+              {loading ? (
+                <div className="text-center py-12">
+                  <Loader className="w-8 h-8 text-teal-600 mx-auto animate-spin" />
+                </div>
+              ) : projects.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {projects.map((project) => (
+                    <ProjectCard key={project.id} {...project} />
+                  ))}
+                </div>
+              ) : (
                 <div className="text-center py-12">
                   <Folder className="w-12 h-12 text-slate-300 mx-auto mb-3" />
                   <p className="text-slate-500">Chưa có dự án nào</p>
@@ -139,7 +234,11 @@ const DashboardPage = () => {
               </h2>
             </div>
             <div className="space-y-4">
-              {recentActivities.length > 0 ? (
+              {loading ? (
+                <div className="text-center py-8">
+                  <Loader className="w-6 h-6 text-teal-600 mx-auto animate-spin" />
+                </div>
+              ) : recentActivities.length > 0 ? (
                 recentActivities.map((activity, idx) => (
                   <ActivityItem key={idx} {...activity} />
                 ))
@@ -250,28 +349,43 @@ const ActivityItem = ({ type, title, time, status }) => {
   );
 };
 
-const ProjectCard = ({ name, description, progress, lastUpdated }) => {
+const ProjectCard = ({ id, name, description, created_at }) => {
+  // Calculate progress based on creation date (mock calculation)
+  const daysOld = Math.floor((new Date() - new Date(created_at)) / (1000 * 60 * 60 * 24));
+  const progress = Math.min(daysOld * 5, 100);
+  
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    if (date.toDateString() === today.toDateString()) return "Hôm nay";
+    if (date.toDateString() === yesterday.toDateString()) return "Hôm qua";
+    return date.toLocaleDateString("vi-VN");
+  };
+
   return (
-    <div className="border border-slate-200 rounded-xl p-5 hover:border-teal-300 hover:shadow-md transition-all group cursor-pointer">
+    <a href={`/projects/${id}`} className="border border-slate-200 rounded-xl p-5 hover:border-teal-300 hover:shadow-md transition-all group cursor-pointer">
       <div className="mb-4">
-        <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-teal-600 transition-colors">
+        <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-teal-600 transition-colors line-clamp-1">
           {name}
         </h3>
-        <p className="text-sm text-slate-600">{description}</p>
+        <p className="text-sm text-slate-600 line-clamp-2">{description || "Không có mô tả"}</p>
       </div>
       <div className="space-y-3">
         <div className="flex items-center justify-between text-sm">
           <span className="text-slate-600 font-medium">Tiến độ</span>
-          <span className="font-bold text-slate-900">{progress}%</span>
+          <span className="font-bold text-slate-900">{Math.min(progress, 100)}%</span>
         </div>
         <div className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
           <div
             className="bg-gradient-to-r from-teal-500 to-teal-600 h-2.5 rounded-full transition-all duration-500"
-            style={{ width: `${progress}%` }}
+            style={{ width: `${Math.min(progress, 100)}%` }}
           ></div>
         </div>
         <div className="flex items-center justify-between pt-2">
-          <p className="text-xs text-slate-500">Cập nhật: {lastUpdated}</p>
+          <p className="text-xs text-slate-500">Tạo: {formatDate(created_at)}</p>
           {progress >= 75 && (
             <div className="flex items-center gap-1 text-xs text-emerald-600 font-semibold">
               <TrendingUp className="w-3 h-3" />
@@ -280,50 +394,8 @@ const ProjectCard = ({ name, description, progress, lastUpdated }) => {
           )}
         </div>
       </div>
-    </div>
+    </a>
   );
 };
-
-const recentActivities = [
-  {
-    type: "analysis",
-    title: "Phân tích dữ liệu khảo sát hoàn thành",
-    time: "2 giờ trước",
-    status: "completed"
-  },
-  {
-    type: "document",
-    title: "Đã upload 5 tài liệu mới",
-    time: "5 giờ trước",
-    status: "completed"
-  },
-  {
-    type: "report",
-    title: "Báo cáo tháng 1 đang được tạo",
-    time: "1 ngày trước",
-    status: "processing"
-  },
-  {
-    type: "project",
-    title: "Dự án nghiên cứu thị trường được tạo",
-    time: "2 ngày trước",
-    status: "completed"
-  }
-];
-
-const projects = [
-  {
-    name: "Nghiên cứu thị trường 2024",
-    description: "Phân tích xu hướng thị trường công nghệ",
-    progress: 75,
-    lastUpdated: "Hôm nay"
-  },
-  {
-    name: "Khảo sát khách hàng Q1",
-    description: "Thu thập và phân tích feedback khách hàng",
-    progress: 45,
-    lastUpdated: "Hôm qua"
-  }
-];
 
 export default DashboardPage;
