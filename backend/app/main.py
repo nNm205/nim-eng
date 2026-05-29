@@ -7,7 +7,8 @@ from app.routes import (
     documents, 
     research,
     analysis,
-    reports
+    reports,
+    knowledge_base
 )
 
 app = FastAPI()
@@ -26,6 +27,7 @@ app.include_router(documents.router)
 app.include_router(research.router)
 app.include_router(analysis.router)
 app.include_router(reports.router)
+app.include_router(knowledge_base.router)
 
 @app.get("/")
 def root():

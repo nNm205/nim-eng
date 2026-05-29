@@ -40,3 +40,18 @@ class TaskStatus(str, Enum):
     COMPLETED = "completed"
     FAILED = "failed"
     CANCELLED = "cancelled"
+
+class KnowledgeBaseArticleStatus(str, Enum):
+    PUBLISHED = "published"
+
+class KnowledgeBaseSubmissionStatus(str, Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+class KnowledgeBaseCategory(str, Enum):
+    RESEARCH = "research"
+    ANALYSIS = "analysis"
+    METHODOLOGY = "methodology"
+    TOOLS = "tools"
+    GENERAL = "general"

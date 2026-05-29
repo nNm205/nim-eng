@@ -4,3 +4,4 @@ from app.models.document import Document
 from app.models.research import ResearchSession, SearchResult 
 from app.models.analysis import DocumentAnalysis
 from app.models.report import Report 
+from app.models.knowledge_base import KnowledgeBaseArticle, KnowledgeBaseSubmission
