@@ -206,3 +206,31 @@ def delete_document_analysis(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error"
         )
+
+def get_project_analyses(
+    db: Session,
+    project_id: UUID
+) -> list[DocumentAnalysis]:
+    logger.info(f"Fetching analyses for project: {project_id}")
+
+    try:
+        result = db.execute(
+            select(DocumentAnalysis).join(
+                Document
+            ).where(
+                Document.project_id == project_id
+            )
+        )
+        analyses = result.scalars().all()
+
+        logger.success(f"Found {len(analyses)} analyses for project: {project_id}")
+
+        return analyses
+
+    except Exception as e:
+        logger.error(f"Failed to fetch analyses for project {project_id}: {str(e)}")
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )

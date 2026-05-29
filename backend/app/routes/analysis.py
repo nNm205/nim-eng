@@ -13,7 +13,8 @@ from app.services.project_service import verify_project_ownership
 from app.services.analysis_service import (
     create_document_analysis,
     get_document_analysis_by_id,
-    get_document_analysis_by_document
+    get_document_analysis_by_document,
+    get_project_analyses
 )
 from app.services.document_service import get_document_by_id
 
@@ -155,3 +156,26 @@ def get_document_entities(
     return {
         "entities": analysis.extracted_entities
     }
+
+
+@router.get(
+    "/projects/{project_id}/analyses",
+    response_model=list[DocumentAnalysisResponse]
+)
+def get_project_analyses_endpoint(
+    project_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    verify_project_ownership(
+        db=db,
+        project_id=project_id,
+        user_id=current_user.id
+    )
+
+    analyses = get_project_analyses(
+        db=db,
+        project_id=project_id
+    )
+
+    return analyses

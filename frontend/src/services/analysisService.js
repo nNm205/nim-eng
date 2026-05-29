@@ -9,6 +9,12 @@ export const analysisService = {
     return res.data;
   },
 
+  // Get project analyses
+  getProjectAnalyses: async (projectId) => {
+    const res = await api.get(`/api/v1/projects/${projectId}/analyses`);
+    return res.data;
+  },
+
   // Get analysis status
   getAnalysisStatus: async (projectId, taskId) => {
     const res = await api.get(`/api/v1/projects/${projectId}/analysis/${taskId}`);

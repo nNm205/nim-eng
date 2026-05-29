@@ -58,23 +58,15 @@ const AnalysisPage = () => {
   const loadDocuments = async (projectId) => {
     try {
       setLoading(true);
-      const data = await documentService.getProjectDocuments(projectId);
-      setDocuments(data);
-      // Mock analyses data
-      const mockAnalyses = data
-        .filter((d) => d.processed)
-        .map((d) => ({
-          id: `analysis-${d.id}`,
-          document_id: d.id,
-          document_title: d.title,
-          status: "completed",
-          started_at: new Date().toISOString(),
-          completed_at: new Date().toISOString(),
-        }));
-      setAnalyses(mockAnalyses);
+      const [docs, analyses] = await Promise.all([
+        documentService.getProjectDocuments(projectId),
+        analysisService.getProjectAnalyses(projectId),
+      ]);
+      setDocuments(docs);
+      setAnalyses(analyses);
       setError("");
     } catch (err) {
-      setError("Không thể tải danh sách tài liệu");
+      setError("Không thể tải dữ liệu phân tích");
       console.error(err);
     } finally {
       setLoading(false);
@@ -279,9 +271,7 @@ const AnalysisPage = () => {
               <AnalysisCard
                 key={analysis.id}
                 analysis={analysis}
-                onClick={() =>
-                  navigate(`/analysis/${analysis.id}`, { state: { analysis } })
-                }
+                onClick={() => navigate(`/analysis/${analysis.id}`)}
               />
             ))}
           </div>
