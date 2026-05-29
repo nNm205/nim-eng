@@ -23,31 +23,7 @@ const ProjectDetailsPage = () => {
   const loadProject = async () => {
     try {
       setLoading(true);
-      // Tìm project từ danh sách hoặc load từ API
-      // const data = await projectService.getProject(projectId);
-      // Tạm thời mock data - bạn sẽ kết nối với API thực tế
-      const data = {
-        id: projectId,
-        name: "Nghiên cứu thị trường 2024",
-        description: "Phân tích chi tiết xu hướng thị trường công nghệ và ảnh hưởng của AI trong ngành công nghiệp",
-        topic: "Artificial Intelligence, Market Research",
-        research_scope: "Phạm vi: Thị trường công nghệ tại Việt Nam và Đông Nam Á\nGiới hạn: Chỉ tập trung vào AI, không bao gồm các công nghệ khác\nMục tiêu: Xác định các xu hướng chính và cơ hội kinh doanh",
-        status: "active",
-        is_archived: false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        documents: [
-          { id: 1, name: "Market Analysis Report" },
-          { id: 2, name: "Competitor Research" },
-        ],
-        research_sessions: [
-          { id: 1, name: "Data Analysis 1" },
-          { id: 2, name: "Data Analysis 2" },
-        ],
-        reports: [
-          { id: 1, name: "Preliminary Report" },
-        ],
-      };
+      const data = await projectService.getProject(projectId);
       setProject(data);
       setFormData({
         name: data.name,
@@ -71,14 +47,20 @@ const ProjectDetailsPage = () => {
     setError("");
 
     try {
-      // await projectService.updateProject(projectId, formData);
-      setMessage({ type: "success", text: "Cập nhật dự án thành công!" });
-      // Tạm thời cập nhật local state
-      setProject({ ...project, ...formData });
+      const updated = await projectService.updateProject(projectId, formData);
+      setProject(updated);
+      setFormData({
+        name: updated.name,
+        description: updated.description || "",
+        topic: updated.topic || "",
+        research_scope: updated.research_scope || "",
+        status: updated.status,
+      });
       setIsEditing(false);
+      setMessage({ type: "success", text: "Cập nhật dự án thành công!" });
       setTimeout(() => setMessage({ type: "", text: "" }), 3000);
     } catch (err) {
-      setError("Không thể cập nhật dự án");
+      setError(err.response?.data?.detail || "Không thể cập nhật dự án");
     } finally {
       setApiLoading(false);
     }
@@ -94,15 +76,15 @@ const ProjectDetailsPage = () => {
   const handleArchive = async () => {
     setApiLoading(true);
     try {
-      // await projectService.updateProject(projectId, { is_archived: !project.is_archived });
-      setProject({ ...project, is_archived: !project.is_archived });
+      const updated = await projectService.updateProject(projectId, { is_archived: !project.is_archived });
+      setProject(updated);
       setMessage({ 
         type: "success", 
         text: project.is_archived ? "Bỏ lưu trữ dự án thành công!" : "Lưu trữ dự án thành công!" 
       });
       setTimeout(() => setMessage({ type: "", text: "" }), 3000);
     } catch (err) {
-      setError("Không thể cập nhật trạng thái");
+      setError(err.response?.data?.detail || "Không thể cập nhật trạng thái");
     } finally {
       setApiLoading(false);
     }
@@ -113,10 +95,10 @@ const ProjectDetailsPage = () => {
     
     setApiLoading(true);
     try {
-      // await projectService.deleteProject(projectId);
+      await projectService.deleteProject(projectId);
       navigate("/projects");
     } catch (err) {
-      setError("Không thể xóa dự án");
+      setError(err.response?.data?.detail || "Không thể xóa dự án");
     } finally {
       setApiLoading(false);
     }

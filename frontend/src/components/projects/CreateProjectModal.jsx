@@ -39,9 +39,6 @@ const CreateProjectModal = ({ onClose, onCreate }) => {
         <div className="sticky top-0 bg-white border-b border-slate-200 px-8 py-6 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-slate-900">Tạo dự án mới</h2>
-            <p className="text-sm text-slate-600 mt-1">
-              Khởi tạo một dự án nghiên cứu học thuật mới
-            </p>
           </div>
           <button
             onClick={onClose}
@@ -75,9 +72,6 @@ const CreateProjectModal = ({ onClose, onCreate }) => {
               className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-transparent transition-all text-slate-900"
               placeholder="Ví dụ: Nghiên cứu ảnh hưởng của AI tới giáo dục"
             />
-            <p className="text-xs text-slate-500 mt-2">
-              Tối thiểu 3 ký tự, tối đa 255 ký tự
-            </p>
           </div>
 
           {/* Topic */}
@@ -94,9 +88,6 @@ const CreateProjectModal = ({ onClose, onCreate }) => {
               className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-transparent transition-all text-slate-900"
               placeholder="Ví dụ: Artificial Intelligence, Education Technology, Machine Learning"
             />
-            <p className="text-xs text-slate-500 mt-2">
-              Thêm các chủ đề liên quan để tổ chức dự án
-            </p>
           </div>
 
           {/* Description */}
@@ -127,9 +118,6 @@ const CreateProjectModal = ({ onClose, onCreate }) => {
               className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-transparent transition-all resize-none text-slate-900"
               placeholder="Xác định phạm vi, giới hạn, các giả thuyết và mục tiêu cụ thể của dự án..."
             />
-            <p className="text-xs text-slate-500 mt-2">
-              Định rõ những gì sẽ và sẽ không được đưa vào phạm vi nghiên cứu
-            </p>
           </div>
 
           {/* Actions */}

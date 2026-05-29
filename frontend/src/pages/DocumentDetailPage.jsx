@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import { documentService } from "../services/documentService";
 import { projectService } from "../services/projectService";
-import { ArrowLeft, Trash2, Edit2, CheckCircle2, Clock, Link2, AlertCircle, FileText } from "lucide-react";
+import { ArrowLeft, Trash2, Edit2, CheckCircle2, Clock, Link2, AlertCircle, FileText, Globe, GraduationCap, Upload, BookOpen } from "lucide-react";
 
 const DocumentDetailPage = () => {
   const { projectId, documentId } = useParams();
@@ -25,23 +25,18 @@ const DocumentDetailPage = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      // Load project
-      const projectsData = await projectService.getProjects();
-      const proj = projectsData.find(p => p.id === projectId);
+      const [proj, doc] = await Promise.all([
+        projectService.getProject(projectId),
+        documentService.getDocument(projectId, documentId),
+      ]);
       setProject(proj);
-
-      // Load document
-      const docData = await documentService.getProjectDocuments(projectId);
-      const doc = docData.find(d => d.id === documentId);
-      if (doc) {
-        setDocument(doc);
-        setFormData({
-          title: doc.title,
-          source_url: doc.source_url || "",
-          source_type: doc.source_type || "text",
-          content: doc.content || "",
-        });
-      }
+      setDocument(doc);
+      setFormData({
+        title: doc.title,
+        source_url: doc.source_url || "",
+        source_type: doc.source_type || "web",
+        content: doc.content || "",
+      });
       setError("");
     } catch (err) {
       setError("Không thể tải thông tin tài liệu");
@@ -67,7 +62,7 @@ const DocumentDetailPage = () => {
       setIsEditing(false);
       setTimeout(() => setMessage({ type: "", text: "" }), 3000);
     } catch (err) {
-      setError("Không thể cập nhật tài liệu");
+      setError(err.response?.data?.detail || "Không thể cập nhật tài liệu");
     } finally {
       setApiLoading(false);
     }
@@ -88,7 +83,7 @@ const DocumentDetailPage = () => {
       await documentService.deleteDocument(projectId, documentId);
       navigate(`/projects/${projectId}`);
     } catch (err) {
-      setError("Không thể xóa tài liệu");
+      setError(err.response?.data?.detail || "Không thể xóa tài liệu");
     } finally {
       setApiLoading(false);
     }
@@ -106,14 +101,18 @@ const DocumentDetailPage = () => {
   };
 
   const sourceTypes = [
-    { value: "text", label: "📝 Văn bản" },
-    { value: "url", label: "🔗 URL" },
-    { value: "pdf", label: "📕 PDF" },
-    { value: "upload", label: "📤 Upload" },
+    { value: "web",      label: "Trang web",      icon: Globe },
+    { value: "academic", label: "Học thuật",       icon: GraduationCap },
+    { value: "uploaded", label: "Tải lên",         icon: Upload },
+    { value: "pdf",      label: "PDF",             icon: BookOpen },
   ];
 
+  const getSourceTypeConfig = (sourceType) => {
+    return sourceTypes.find(t => t.value === sourceType) || { label: sourceType, icon: FileText };
+  };
+
   const getSourceTypeLabel = (sourceType) => {
-    return sourceTypes.find(t => t.value === sourceType)?.label || sourceType;
+    return getSourceTypeConfig(sourceType).label;
   };
 
   if (loading) {
@@ -190,10 +189,8 @@ const DocumentDetailPage = () => {
                 <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-start gap-4 flex-1">
-                      <div className="text-5xl">
-                        {document.source_type === "pdf" ? "📕" : 
-                         document.source_type === "url" ? "🔗" : 
-                         document.source_type === "upload" ? "📤" : "📝"}
+                      <div className="w-14 h-14 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center flex-shrink-0">
+                        {(() => { const Icon = getSourceTypeConfig(document.source_type).icon; return <Icon className="w-7 h-7 text-teal-600" />; })()}
                       </div>
                       <div className="flex-1">
                         <h1 className="text-3xl font-bold text-slate-900 mb-2">
@@ -306,7 +303,7 @@ const DocumentDetailPage = () => {
                     <div className="border-t border-slate-200 pt-4">
                       <p className="text-xs font-semibold text-slate-600 mb-2">Cập nhật lần cuối</p>
                       <p className="text-sm text-slate-700 font-medium">
-                        {formatDate(document.created_at)}
+                        {formatDate(document.updated_at)}
                       </p>
                     </div>
 
@@ -365,21 +362,29 @@ const DocumentDetailPage = () => {
 
               {/* Source Type */}
               <div>
-                <label className="block text-sm font-semibold text-slate-900 mb-2">
+                <label className="block text-sm font-semibold text-slate-900 mb-3">
                   Loại nguồn
                 </label>
-                <select
-                  name="source_type"
-                  value={formData.source_type}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-transparent transition-all"
-                >
-                  {sourceTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="grid grid-cols-2 gap-3">
+                  {sourceTypes.map(({ value, label, icon: Icon }) => {
+                    const active = formData.source_type === value;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, source_type: value })}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all ${
+                          active
+                            ? "border-teal-500 bg-teal-50"
+                            : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+                        }`}
+                      >
+                        <Icon className={`w-5 h-5 flex-shrink-0 ${active ? "text-teal-600" : "text-slate-400"}`} />
+                        <span className={`text-sm font-semibold ${active ? "text-teal-700" : "text-slate-700"}`}>{label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Source URL */}

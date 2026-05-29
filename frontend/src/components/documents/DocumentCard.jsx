@@ -1,4 +1,14 @@
-import { FileText, Link2, CheckCircle2, Clock } from "lucide-react";
+import { FileText, Link2, CheckCircle2, Clock, Globe, GraduationCap, Upload, BookOpen } from "lucide-react";
+
+const SOURCE_TYPE_CONFIG = {
+  web:      { label: "Trang web", icon: Globe,         color: "text-blue-600",   bg: "bg-blue-50",   border: "border-blue-200"   },
+  academic: { label: "Học thuật", icon: GraduationCap, color: "text-violet-600", bg: "bg-violet-50", border: "border-violet-200" },
+  uploaded: { label: "Tải lên",   icon: Upload,        color: "text-amber-600",  bg: "bg-amber-50",  border: "border-amber-200"  },
+  pdf:      { label: "PDF",       icon: BookOpen,      color: "text-rose-600",   bg: "bg-rose-50",   border: "border-rose-200"   },
+};
+
+const getSourceConfig = (sourceType) =>
+  SOURCE_TYPE_CONFIG[sourceType] || { label: sourceType, icon: FileText, color: "text-slate-600", bg: "bg-slate-50", border: "border-slate-200" };
 
 const DocumentCard = ({ document, onClick }) => {
   const formatDate = (dateString) => {
@@ -10,25 +20,8 @@ const DocumentCard = ({ document, onClick }) => {
     });
   };
 
-  const getSourceTypeIcon = (sourceType) => {
-    const icons = {
-      pdf: "📕",
-      url: "🔗",
-      text: "📝",
-      upload: "📤",
-    };
-    return icons[sourceType] || "📄";
-  };
-
-  const getSourceTypeLabel = (sourceType) => {
-    const labels = {
-      pdf: "PDF",
-      url: "URL",
-      text: "Văn bản",
-      upload: "Upload",
-    };
-    return labels[sourceType] || sourceType;
-  };
+  const sourceConfig = getSourceConfig(document.source_type);
+  const SourceIcon = sourceConfig.icon;
 
   const truncateText = (text, maxLength = 150) => {
     if (!text) return "";
@@ -44,16 +37,17 @@ const DocumentCard = ({ document, onClick }) => {
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start gap-3 flex-1 min-w-0">
-          <div className="text-3xl flex-shrink-0">
-            {getSourceTypeIcon(document.source_type)}
+          <div className={`w-11 h-11 rounded-xl ${sourceConfig.bg} border ${sourceConfig.border} flex items-center justify-center flex-shrink-0`}>
+            <SourceIcon className={`w-5 h-5 ${sourceConfig.color}`} />
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="text-lg font-bold text-slate-900 group-hover:text-teal-600 transition-colors mb-2 line-clamp-2">
               {document.title}
             </h3>
             {document.source_type && (
-              <span className="inline-block text-xs font-semibold text-slate-500 uppercase bg-slate-100 px-2.5 py-1 rounded-lg">
-                {getSourceTypeLabel(document.source_type)}
+              <span className={`inline-flex items-center gap-1.5 text-xs font-semibold ${sourceConfig.color} ${sourceConfig.bg} border ${sourceConfig.border} px-2.5 py-1 rounded-lg`}>
+                <SourceIcon className="w-3 h-3" />
+                {sourceConfig.label}
               </span>
             )}
           </div>

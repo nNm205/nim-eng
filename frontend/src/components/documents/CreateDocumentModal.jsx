@@ -1,11 +1,18 @@
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, Globe, GraduationCap, Upload, BookOpen } from "lucide-react";
+
+const SOURCE_TYPES = [
+  { value: "web",      label: "Trang web", icon: Globe,         description: "Bài viết, trang tin tức, blog" },
+  { value: "academic", label: "Học thuật", icon: GraduationCap, description: "Bài báo, luận văn, nghiên cứu" },
+  { value: "uploaded", label: "Tải lên",   icon: Upload,        description: "File từ máy tính của bạn" },
+  { value: "pdf",      label: "PDF",       icon: BookOpen,      description: "Tài liệu định dạng PDF" },
+];
 
 const CreateDocumentModal = ({ onClose, onCreate }) => {
   const [formData, setFormData] = useState({
     title: "",
     source_url: "",
-    source_type: "text",
+    source_type: "web",
     content: "",
   });
   const [loading, setLoading] = useState(false);
@@ -32,13 +39,6 @@ const CreateDocumentModal = ({ onClose, onCreate }) => {
     });
   };
 
-  const sourceTypes = [
-    { value: "text", label: "📝 Văn bản" },
-    { value: "url", label: "🔗 URL" },
-    { value: "pdf", label: "📕 PDF" },
-    { value: "upload", label: "📤 Upload" },
-  ];
-
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
@@ -46,9 +46,6 @@ const CreateDocumentModal = ({ onClose, onCreate }) => {
         <div className="bg-white border-b border-slate-200 px-8 py-6 flex items-center justify-between flex-shrink-0">
           <div>
             <h2 className="text-2xl font-bold text-slate-900">Thêm tài liệu mới</h2>
-            <p className="text-sm text-slate-600 mt-1">
-              Thêm tài liệu vào dự án nghiên cứu của bạn
-            </p>
           </div>
           <button
             onClick={onClose}
@@ -82,26 +79,34 @@ const CreateDocumentModal = ({ onClose, onCreate }) => {
             />
           </div>
 
-          {/* Source Type */}
+          {/* Source Type — icon button grid */}
           <div>
-            <label className="block text-sm font-semibold text-slate-900 mb-2">
+            <label className="block text-sm font-semibold text-slate-900 mb-3">
               Loại nguồn
             </label>
-            <select
-              name="source_type"
-              value={formData.source_type}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-transparent transition-all text-slate-900"
-            >
-              {sourceTypes.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-slate-500 mt-2">
-              Chọn loại nguồn của tài liệu
-            </p>
+            <div className="grid grid-cols-2 gap-3">
+              {SOURCE_TYPES.map(({ value, label, icon: Icon, description }) => {
+                const active = formData.source_type === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, source_type: value })}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all ${
+                      active
+                        ? "border-teal-500 bg-teal-50 text-teal-700"
+                        : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 flex-shrink-0 ${active ? "text-teal-600" : "text-slate-400"}`} />
+                    <div className="min-w-0">
+                      <p className={`text-sm font-semibold leading-tight ${active ? "text-teal-700" : "text-slate-700"}`}>{label}</p>
+                      <p className="text-xs text-slate-500 mt-0.5 truncate">{description}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Source URL */}
@@ -117,9 +122,6 @@ const CreateDocumentModal = ({ onClose, onCreate }) => {
               className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-transparent transition-all text-slate-900"
               placeholder="https://example.com/document.pdf"
             />
-            <p className="text-xs text-slate-500 mt-2">
-              Link đến tài liệu gốc (nếu có)
-            </p>
           </div>
 
           {/* Content */}
@@ -135,9 +137,6 @@ const CreateDocumentModal = ({ onClose, onCreate }) => {
               className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-transparent transition-all resize-none font-mono text-sm text-slate-900"
               placeholder="Nhập hoặc paste nội dung tài liệu..."
             />
-            <p className="text-xs text-slate-500 mt-2">
-              Nội dung văn bản của tài liệu
-            </p>
           </div>
 
           {/* Actions */}
