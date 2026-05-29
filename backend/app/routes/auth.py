@@ -1,7 +1,9 @@
 from fastapi import (APIRouter, Depends, status) 
 from sqlalchemy.orm import Session
 from app.database.session import get_db 
-from app.schemas.user import (UserRegister, UserLogin, TokenResponse)
+from app.dependencies import get_current_user
+from app.models.user import User
+from app.schemas.user import (UserRegister, UserLogin, TokenResponse, UserResponse)
 from app.services.auth_service import (register_user, login_user)
 
 router = APIRouter(prefix="/api/v1/auth", tags=["Auth"])
@@ -33,3 +35,14 @@ def login(
         user_data=user_data,
         db=db 
     )
+
+@router.get(
+    "/me",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK
+)
+def get_current_user_info(
+    current_user: User = Depends(get_current_user)
+):
+    """Get current authenticated user information"""
+    return current_user

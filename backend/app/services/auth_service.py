@@ -53,7 +53,8 @@ def register_user(
                 full_name=new_user.full_name,
                 avatar_url=new_user.avatar_url, 
                 subscription_plan=new_user.subscription_plan,
-                is_active=new_user.is_active
+                is_active=new_user.is_active,
+                is_admin=new_user.is_admin
             )
         )
     
@@ -112,6 +113,7 @@ def login_user(user_data: UserLogin, db: Session) -> TokenResponse:
             full_name=user.full_name,
             avatar_url=user.avatar_url, 
             subscription_plan=user.subscription_plan,
-            is_active=user.is_active 
+            is_active=user.is_active,
+            is_admin=user.is_admin
         )
     )

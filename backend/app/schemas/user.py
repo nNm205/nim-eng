@@ -17,6 +17,7 @@ class UserResponse(BaseModel):
     avatar_url: str| None 
     subscription_plan: str
     is_active: bool
+    is_admin: bool
 
 class TokenResponse(BaseModel):
     access_token: str 
