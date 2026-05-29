@@ -35,22 +35,7 @@ const ReportDetailPage = () => {
   const loadReport = async () => {
     try {
       setLoading(true);
-      // Mock data - thay thế bằng API thực tế
-      const data = {
-        id: reportId,
-        title: "Báo cáo phân tích thị trường AI 2024",
-        report_type: "research_summary",
-        content: "Nội dung chi tiết của báo cáo...",
-        status: "published",
-        is_archived: false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        included_documents: [
-          { id: 1, name: "AI Market Analysis" },
-          { id: 2, name: "Trend Analysis" },
-        ],
-        project_id: 1,
-      };
+      const data = await reportService.getReport(reportId);
       
       setReport(data);
       setFormData({
@@ -97,13 +82,14 @@ const ReportDetailPage = () => {
   const handleArchive = async () => {
     setApiLoading(true);
     try {
+      const newStatus = report.status === "archived" ? "draft" : "archived";
       const updated = await reportService.updateReport(reportId, {
-        is_archived: !report.is_archived,
+        status: newStatus,
       });
       setReport(updated);
       setMessage({
         type: "success",
-        text: report.is_archived
+        text: report.status === "archived"
           ? "Bỏ lưu trữ báo cáo thành công!"
           : "Lưu trữ báo cáo thành công!",
       });
@@ -260,7 +246,7 @@ const ReportDetailPage = () => {
                     {reportTypeLabels[report.report_type] || report.report_type}
                   </p>
                 </div>
-                {report.is_archived && (
+                {report.status === "archived" && (
                   <span className="flex-shrink-0 bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-lg font-medium ml-2">
                     📦 Đã lưu trữ
                   </span>
@@ -387,7 +373,7 @@ const ReportDetailPage = () => {
                     disabled={apiLoading}
                     className="w-full flex items-center justify-center gap-2 px-6 py-3 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 font-semibold transition-colors disabled:opacity-50"
                   >
-                    {report.is_archived ? (
+                    {report.status === "archived" ? (
                       <>
                         <ArchiveRestore className="w-4 h-4" />
                         Bỏ lưu trữ

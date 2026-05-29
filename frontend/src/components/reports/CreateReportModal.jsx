@@ -60,9 +60,6 @@ const CreateReportModal = ({ onClose, onCreate }) => {
         <div className="sticky top-0 bg-white border-b border-slate-200 px-8 py-6 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-slate-900">Tạo báo cáo mới</h2>
-            <p className="text-sm text-slate-600 mt-1">
-              Khởi tạo một báo cáo nghiên cứu mới cho dự án
-            </p>
           </div>
           <button
             onClick={onClose}
@@ -96,9 +93,6 @@ const CreateReportModal = ({ onClose, onCreate }) => {
               className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-transparent transition-all text-slate-900"
               placeholder="Ví dụ: Báo cáo phân tích thị trường AI 2024"
             />
-            <p className="text-xs text-slate-500 mt-2">
-              Tối thiểu 3 ký tự, tối đa 255 ký tự
-            </p>
           </div>
 
           {/* Report Type */}
@@ -142,13 +136,10 @@ const CreateReportModal = ({ onClose, onCreate }) => {
               className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-transparent transition-all resize-none text-slate-900"
               placeholder="Nhập nội dung sơ bộ của báo cáo (có thể sửa đổi sau)..."
             />
-            <p className="text-xs text-slate-500 mt-2">
-              Bạn có thể bổ sung nội dung sau khi tạo báo cáo
-            </p>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-3 pt-6 border-t border-slate-200">
+          <div className="flex items-center justify-end gap-3 pt-6">
             <button
               type="button"
               onClick={onClose}
