@@ -1,8 +1,8 @@
 """initial commit
 
-Revision ID: 9f7295b2c9ca
+Revision ID: e26857373497
 Revises: 
-Create Date: 2026-05-27 09:28:20.506382
+Create Date: 2026-05-29 09:46:11.392447
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '9f7295b2c9ca'
+revision: str = 'e26857373497'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -28,6 +28,7 @@ def upgrade() -> None:
     sa.Column('full_name', sa.String(length=255), nullable=True),
     sa.Column('avatar_url', sa.Text(), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=False),
+    sa.Column('is_admin', sa.Boolean(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('last_login', sa.DateTime(timezone=True), nullable=True),
@@ -36,6 +37,56 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
     op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
+    op.create_table('knowledge_base_articles',
+    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('title', sa.String(length=500), nullable=False),
+    sa.Column('excerpt', sa.Text(), nullable=False),
+    sa.Column('content', sa.Text(), nullable=False),
+    sa.Column('category', sa.String(length=100), nullable=False),
+    sa.Column('tags', postgresql.ARRAY(sa.String()), nullable=True),
+    sa.Column('status', sa.String(length=50), nullable=False),
+    sa.Column('views', sa.Integer(), nullable=False),
+    sa.Column('created_by', sa.UUID(), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
+    sa.ForeignKeyConstraint(['created_by'], ['users.id'], ondelete='SET NULL'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index('idx_kb_articles_category', 'knowledge_base_articles', ['category'], unique=False)
+    op.create_index('idx_kb_articles_created_at', 'knowledge_base_articles', ['created_at'], unique=False)
+    op.create_index('idx_kb_articles_created_by', 'knowledge_base_articles', ['created_by'], unique=False)
+    op.create_index('idx_kb_articles_status', 'knowledge_base_articles', ['status'], unique=False)
+    op.create_index(op.f('ix_knowledge_base_articles_category'), 'knowledge_base_articles', ['category'], unique=False)
+    op.create_index(op.f('ix_knowledge_base_articles_created_at'), 'knowledge_base_articles', ['created_at'], unique=False)
+    op.create_index(op.f('ix_knowledge_base_articles_created_by'), 'knowledge_base_articles', ['created_by'], unique=False)
+    op.create_index(op.f('ix_knowledge_base_articles_id'), 'knowledge_base_articles', ['id'], unique=False)
+    op.create_index(op.f('ix_knowledge_base_articles_status'), 'knowledge_base_articles', ['status'], unique=False)
+    op.create_index(op.f('ix_knowledge_base_articles_title'), 'knowledge_base_articles', ['title'], unique=False)
+    op.create_table('knowledge_base_submissions',
+    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('title', sa.String(length=500), nullable=False),
+    sa.Column('excerpt', sa.Text(), nullable=False),
+    sa.Column('content', sa.Text(), nullable=False),
+    sa.Column('category', sa.String(length=100), nullable=False),
+    sa.Column('tags', postgresql.ARRAY(sa.String()), nullable=True),
+    sa.Column('status', sa.String(length=50), nullable=False),
+    sa.Column('created_by', sa.UUID(), nullable=False),
+    sa.Column('rejection_reason', sa.Text(), nullable=True),
+    sa.Column('reviewed_by', sa.UUID(), nullable=True),
+    sa.Column('reviewed_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
+    sa.ForeignKeyConstraint(['created_by'], ['users.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['reviewed_by'], ['users.id'], ondelete='SET NULL'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index('idx_kb_submissions_created_at', 'knowledge_base_submissions', ['created_at'], unique=False)
+    op.create_index('idx_kb_submissions_created_by', 'knowledge_base_submissions', ['created_by'], unique=False)
+    op.create_index('idx_kb_submissions_status', 'knowledge_base_submissions', ['status'], unique=False)
+    op.create_index(op.f('ix_knowledge_base_submissions_created_at'), 'knowledge_base_submissions', ['created_at'], unique=False)
+    op.create_index(op.f('ix_knowledge_base_submissions_created_by'), 'knowledge_base_submissions', ['created_by'], unique=False)
+    op.create_index(op.f('ix_knowledge_base_submissions_id'), 'knowledge_base_submissions', ['id'], unique=False)
+    op.create_index(op.f('ix_knowledge_base_submissions_status'), 'knowledge_base_submissions', ['status'], unique=False)
     op.create_table('projects',
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('user_id', sa.UUID(), nullable=False),
@@ -160,6 +211,25 @@ def downgrade() -> None:
     op.drop_table('documents')
     op.drop_index(op.f('ix_projects_id'), table_name='projects')
     op.drop_table('projects')
+    op.drop_index(op.f('ix_knowledge_base_submissions_status'), table_name='knowledge_base_submissions')
+    op.drop_index(op.f('ix_knowledge_base_submissions_id'), table_name='knowledge_base_submissions')
+    op.drop_index(op.f('ix_knowledge_base_submissions_created_by'), table_name='knowledge_base_submissions')
+    op.drop_index(op.f('ix_knowledge_base_submissions_created_at'), table_name='knowledge_base_submissions')
+    op.drop_index('idx_kb_submissions_status', table_name='knowledge_base_submissions')
+    op.drop_index('idx_kb_submissions_created_by', table_name='knowledge_base_submissions')
+    op.drop_index('idx_kb_submissions_created_at', table_name='knowledge_base_submissions')
+    op.drop_table('knowledge_base_submissions')
+    op.drop_index(op.f('ix_knowledge_base_articles_title'), table_name='knowledge_base_articles')
+    op.drop_index(op.f('ix_knowledge_base_articles_status'), table_name='knowledge_base_articles')
+    op.drop_index(op.f('ix_knowledge_base_articles_id'), table_name='knowledge_base_articles')
+    op.drop_index(op.f('ix_knowledge_base_articles_created_by'), table_name='knowledge_base_articles')
+    op.drop_index(op.f('ix_knowledge_base_articles_created_at'), table_name='knowledge_base_articles')
+    op.drop_index(op.f('ix_knowledge_base_articles_category'), table_name='knowledge_base_articles')
+    op.drop_index('idx_kb_articles_status', table_name='knowledge_base_articles')
+    op.drop_index('idx_kb_articles_created_by', table_name='knowledge_base_articles')
+    op.drop_index('idx_kb_articles_created_at', table_name='knowledge_base_articles')
+    op.drop_index('idx_kb_articles_category', table_name='knowledge_base_articles')
+    op.drop_table('knowledge_base_articles')
     op.drop_index(op.f('ix_users_id'), table_name='users')
     op.drop_index(op.f('ix_users_email'), table_name='users')
     op.drop_table('users')
