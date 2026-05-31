@@ -1,6 +1,6 @@
 import uuid 
+from datetime import datetime, timezone
 from typing import Any
-from datetime import datetime, timezone 
 from sqlalchemy import (
     String,
     Text,
@@ -107,4 +107,12 @@ class Document(Base):
         cascade="all, delete-orphan",
         lazy="selectin"
     )
+
+    chunks = relationship(
+        "DocumentChunk",
+        back_populates="document",
+        cascade="all, delete-orphan"
+    )
+
+
 

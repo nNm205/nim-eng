@@ -7,12 +7,14 @@ from sqlalchemy import (
     ForeignKey,
     DateTime,
     Text,
-    Index 
+    Index,
+    Boolean,
+    Enum 
 )
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.base import Base
-from app.utils.constants import ResearchStatus
+from app.utils.constants import ResearchStatus, SearchType, SearchSource
 
 class ResearchSession(Base):
     __tablename__ = "research_sessions"
@@ -88,7 +90,10 @@ class SearchResult(Base):
     __tablename__ = "search_results"
 
     __table_args__ = (
-        Index("idx_search_results_research_session_id", "research_session_id"),
+        Index(
+            "idx_search_results_research_session_id",
+            "research_session_id"
+        ),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -100,13 +105,19 @@ class SearchResult(Base):
 
     research_session_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("research_sessions.id", ondelete="CASCADE"),
+        ForeignKey(
+            "research_sessions.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
     document_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("documents.id", ondelete="SET NULL"),
+        ForeignKey(
+            "documents.id",
+            ondelete="SET NULL"
+        ),
         nullable=True
     )
 
@@ -125,13 +136,60 @@ class SearchResult(Base):
         nullable=True
     )
 
-    source: Mapped[str] = mapped_column(
-        String(100),
+    content_preview: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True
+    )
+
+    source: Mapped[SearchSource] = mapped_column(
+        Enum(SearchSource, name="search_source_enum"),
+        default=SearchSource.WEB,
         nullable=False
+    )
+
+    search_type: Mapped[SearchType] = mapped_column(
+        Enum(SearchType, name="search_type_enum"),
+        default=SearchType.WEB,
+        nullable=False
+    )
+
+    search_query: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True
+    )
+
+    source_id: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True
     )
 
     rank: Mapped[int | None] = mapped_column(
         Integer,
+        nullable=True
+    )
+
+    authors: Mapped[list[str] | None] = mapped_column(
+        JSONB,
+        nullable=True
+    )
+
+    published_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True
+    )
+
+    doi: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True
+    )
+
+    pdf_url: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True
+    )
+
+    retrieval_score: Mapped[float | None] = mapped_column(
+        Float,
         nullable=True
     )
 
@@ -140,12 +198,29 @@ class SearchResult(Base):
         nullable=True
     )
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc)
+    is_selected: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        nullable=False
     )
 
-    # relationships
+    embedding_id: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True
+    )
+
+    raw_metadata: Mapped[dict | None] = mapped_column(
+        JSONB,
+        nullable=True
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False
+    )
+
+    # relationships 
     research_session = relationship(
         "ResearchSession",
         back_populates="search_results",
