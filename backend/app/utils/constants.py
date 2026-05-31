@@ -1,4 +1,5 @@
-from enum import Enum 
+from enum import Enum
+
 
 class ResearchStatus(str, Enum):
     PENDING = "pending"
@@ -6,16 +7,19 @@ class ResearchStatus(str, Enum):
     COMPLETED = "completed"
     FAILED = "failed"
 
+
 class AnalysisStatus(str, Enum):
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
     FAILED = "failed"
 
+
 class ReportStatus(str, Enum):
     DRAFT = "draft"
     PUBLISHED = "published"
     ARCHIVED = "archived"
+
 
 class ReportType(str, Enum):
     LITERATURE_REVIEW = "literature_review"
@@ -23,16 +27,19 @@ class ReportType(str, Enum):
     RESEARCH_SUMMARY = "research_summary"
     CUSTOM = "custom"
 
+
 class DocumentSourceType(str, Enum):
     WEB = "web"
     ACADEMIC = "academic"
     UPLOADED = "uploaded"
     PDF = "pdf"
 
+
 class TaskType(str, Enum):
     RESEARCH = "research"
     ANALYSIS = "analysis"
     REPORT = "report"
+
 
 class TaskStatus(str, Enum):
     PENDING = "pending"
@@ -41,13 +48,16 @@ class TaskStatus(str, Enum):
     FAILED = "failed"
     CANCELLED = "cancelled"
 
+
 class KnowledgeBaseArticleStatus(str, Enum):
     PUBLISHED = "published"
+
 
 class KnowledgeBaseSubmissionStatus(str, Enum):
     PENDING = "pending"
     APPROVED = "approved"
     REJECTED = "rejected"
+
 
 class KnowledgeBaseCategory(str, Enum):
     RESEARCH = "research"
@@ -55,3 +65,20 @@ class KnowledgeBaseCategory(str, Enum):
     METHODOLOGY = "methodology"
     TOOLS = "tools"
     GENERAL = "general"
+
+
+class SearchType(str, Enum):
+    WEB = "web"
+    ACADEMIC = "academic"
+    WIKIPEDIA = "wikipedia"
+    SEMANTIC = "semantic"
+    HYBRID = "hybrid"
+    NEWS = "news"
+    CODE = "code"
+
+
+class SearchSource(str, Enum):
+    ARXIV = "arxiv"
+    GOOGLE_SCHOLAR = "google_scholar"
+    SEMANTIC_SCHOLAR = "semantic_scholar"
+    WEB = "web"
