@@ -5,9 +5,10 @@ from app.database.session import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
 from app.schemas.analysis import (
-    DocumentAnalysisResponse, 
-    AnalysisResultsResponse, 
-    AnalysisStatusResponse
+    AnalysisCreate,
+    DocumentAnalysisResponse,
+    AnalysisResultsResponse,
+    AnalysisStatusResponse,
 )
 from app.services.project_service import verify_project_ownership
 from app.services.analysis_service import (
@@ -28,7 +29,7 @@ router = APIRouter(prefix="/api/v1", tags=["Analysis"])
 )
 def start_analysis(
     project_id: UUID,
-    document_id: UUID,
+    analysis_data: AnalysisCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -40,7 +41,7 @@ def start_analysis(
 
     document = get_document_by_id(
         db=db,
-        document_id=document_id
+        document_id=analysis_data.document_id
     )
 
     if document.project_id != project_id:
@@ -51,7 +52,7 @@ def start_analysis(
 
     analysis = create_document_analysis(
         db=db,
-        document_id=document_id
+        document_id=analysis_data.document_id
     )
 
     return analysis
@@ -129,9 +130,7 @@ def get_document_summary(
         user_id=current_user.id
     )
 
-    return {
-        "summary": analysis.summary
-    }
+    return {"summary": analysis.summary}
 
 
 @router.get(
@@ -153,9 +152,7 @@ def get_document_entities(
         user_id=current_user.id
     )
 
-    return {
-        "entities": analysis.extracted_entities
-    }
+    return {"entities": analysis.extracted_entities}
 
 
 @router.get(
@@ -173,9 +170,7 @@ def get_project_analyses_endpoint(
         user_id=current_user.id
     )
 
-    analyses = get_project_analyses(
+    return get_project_analyses(
         db=db,
         project_id=project_id
     )
-
-    return analyses

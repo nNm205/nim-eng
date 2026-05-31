@@ -1,17 +1,20 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, status
-from sqlalchemy.orm import Session
-from app.database.session import get_db
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.database.session import get_async_db
 from app.schemas.research import (
     ResearchCreate,
     ResearchResponse,
     ResearchStatusResponse,
-    ResearchResultsResponse
+    ResearchResultsResponse,
+    ResearchHistoryResponse,
 )
-from app.services.project_service import verify_project_ownership
+from app.services.project_service import verify_project_ownership_async
 from app.services.research_service import (
     create_research_session,
-    get_research_session_by_id
+    get_research_session_by_id,
+    get_project_research_sessions,
+    dispatch_research_agent,
 )
 from app.dependencies import get_current_user
 from app.models.user import User
@@ -24,65 +27,89 @@ router = APIRouter(prefix="/api/v1", tags=["Research"])
     response_model=ResearchResponse,
     status_code=status.HTTP_201_CREATED
 )
-def start_research_session(
+async def start_research_session(
     project_id: UUID,
     research_data: ResearchCreate,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: User = Depends(get_current_user)
 ):
-    verify_project_ownership(
+    await verify_project_ownership_async(
         db=db,
         project_id=project_id,
         user_id=current_user.id
     )
 
-    research_session = create_research_session(
+    research_session = await create_research_session(
         db=db,
         project_id=project_id,
         research_data=research_data
     )
 
+    dispatch_research_agent(research_session.id)
+
     return research_session
+
+
+@router.get(
+    "/projects/{project_id}/research",
+    response_model=list[ResearchHistoryResponse],
+)
+async def get_research_history(
+    project_id: UUID,
+    db: AsyncSession = Depends(get_async_db),
+    current_user: User = Depends(get_current_user)
+):
+    await verify_project_ownership_async(
+        db=db,
+        project_id=project_id,
+        user_id=current_user.id
+    )
+
+    return await get_project_research_sessions(
+        db=db,
+        project_id=project_id
+    )
 
 
 @router.get(
     "/projects/{project_id}/research/{task_id}",
     response_model=ResearchStatusResponse
 )
-def get_research_status(
+async def get_research_status(
     project_id: UUID,
     task_id: UUID,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: User = Depends(get_current_user)
 ):
-    verify_project_ownership(
+    await verify_project_ownership_async(
         db=db,
         project_id=project_id,
         user_id=current_user.id
     )
 
-    research_session = get_research_session_by_id(
+    research_session = await get_research_session_by_id(
         db=db,
         research_session_id=task_id
     )
 
     return research_session
 
+
 @router.get(
     "/research/{task_id}/results",
     response_model=ResearchResultsResponse
 )
-def get_research_results(
+async def get_research_results(
     task_id: UUID,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: User = Depends(get_current_user)
 ):
-    research_session = get_research_session_by_id(
+    research_session = await get_research_session_by_id(
         db=db,
         research_session_id=task_id
     )
 
-    verify_project_ownership(
+    await verify_project_ownership_async(
         db=db,
         project_id=research_session.project_id,
         user_id=current_user.id
@@ -97,7 +124,7 @@ def get_research_results(
 @router.post(
     "/research/{task_id}/save-documents"
 )
-def save_research_documents():
+async def save_research_documents(task_id: UUID):
     return {
         "message": "Save documents endpoint"
     }
