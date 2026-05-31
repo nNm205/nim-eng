@@ -77,28 +77,32 @@ def get_all_articles(
     logger.info(f"Fetching articles - category: {category}, search: {search}")
 
     try:
-        query = select(KnowledgeBaseArticle).where(
+        # Build conditions list to reuse for both count and data queries
+        base_conditions = [
             KnowledgeBaseArticle.status == KnowledgeBaseArticleStatus.PUBLISHED.value
-        )
+        ]
 
         if category and category != "all":
-            query = query.where(KnowledgeBaseArticle.category == category)
+            base_conditions.append(KnowledgeBaseArticle.category == category)
 
         if search:
             search_term = f"%{search}%"
-            query = query.where(
+            base_conditions.append(
                 (KnowledgeBaseArticle.title.ilike(search_term)) |
                 (KnowledgeBaseArticle.excerpt.ilike(search_term)) |
                 (KnowledgeBaseArticle.content.ilike(search_term))
             )
 
-        # Get total count
-        count_query = select(func.count()).select_from(KnowledgeBaseArticle).where(
-            query.whereclause if hasattr(query, 'whereclause') else True
-        )
+        # Get total count using the same conditions
+        count_query = select(func.count()).select_from(KnowledgeBaseArticle)
+        for condition in base_conditions:
+            count_query = count_query.where(condition)
         total = db.execute(count_query).scalar() or 0
 
         # Get paginated results
+        query = select(KnowledgeBaseArticle)
+        for condition in base_conditions:
+            query = query.where(condition)
         query = query.order_by(KnowledgeBaseArticle.created_at.desc())
         query = query.offset(skip).limit(limit)
 

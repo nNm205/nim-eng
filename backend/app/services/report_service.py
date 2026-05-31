@@ -31,9 +31,7 @@ def create_report(
         )
 
     try:
-        included_documents = [
-            str(doc_id) for doc_id in report_data.included_documents
-        ] if report_data.included_documents else None 
+        included_documents = report_data.included_documents or None
 
         report = Report(
             project_id=project_id,
@@ -124,8 +122,8 @@ def update_report(
             if hasattr(value, "value"):
                 value = value.value
             
-            if key == "included_documents" and value:
-                value = [str(doc_id) for doc_id in value]
+            if key == "included_documents" and value is not None:
+                value = value  # keep as list[UUID], JSONB handles serialization
 
             setattr(report, key, value)
 

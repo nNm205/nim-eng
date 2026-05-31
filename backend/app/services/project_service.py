@@ -278,3 +278,38 @@ def delete_project(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error"
         )
+
+
+async def verify_project_ownership_async(
+    db,
+    project_id: UUID,
+    user_id: UUID
+) -> Project:
+    from sqlalchemy.ext.asyncio import AsyncSession as _AsyncSession
+
+    logger.info(
+        f"Verifying ownership for project "
+        f"{project_id} and user {user_id}"
+    )
+
+    result = await db.execute(
+        select(Project).where(
+            Project.id == project_id,
+            Project.user_id == user_id
+        )
+    )
+
+    project = result.scalar_one_or_none()
+
+    if not project:
+        logger.warning(
+            f"Unauthorized project access attempt. "
+            f"Project: {project_id}, User: {user_id}"
+        )
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
+    return project
