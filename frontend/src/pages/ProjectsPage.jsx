@@ -35,8 +35,9 @@ const ProjectsPage = () => {
 
   const handleCreateProject = async (projectData) => {
     try {
-      const newProject = await projectService.createProject(projectData);
-      setProjects([newProject, ...projects]);
+      await projectService.createProject(projectData);
+      // Reload full list so counts are accurate from backend
+      await loadProjects();
       setShowCreateModal(false);
     } catch (err) {
       throw err;

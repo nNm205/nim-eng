@@ -17,6 +17,7 @@ import ProjectDetailsPage from "./pages/ProjectDetailPage";
 import DocumentDetailPage from "./pages/DocumentDetailPage";
 import AnalysisResultsPage from "./pages/AnalysisResultsPage";
 import ReportDetailPage from "./pages/ReportDetailPage";
+import ResearchPage from "./pages/ResearchPage";
 
 const App = () => {
   return (
@@ -39,6 +40,7 @@ const App = () => {
             <Route path="/analysis/:analysisId" element={<AnalysisResultsPage />} />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/reports/:reportId" element={<ReportDetailPage />} />
+            <Route path="/projects/:projectId/research" element={<ResearchPage />} />
             <Route path="/knowledge-base" element={<KnowledgeBasePage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/settings" element={<SettingsPage />} />
